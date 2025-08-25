@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>待辦事項清單</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#4CAF50">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="待辦事項">
+    <link rel="apple-touch-icon" href="icon-192x192.png">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📝 待辦事項清單</h1>
+        </header>
+
+        <!-- 新增待辦事項表單 -->
+        <div class="add-form">
+            <div class="input-group">
+                <input type="text" id="todoInput" placeholder="輸入待辦事項... (最多100則)" maxlength="100">
+                <input type="date" id="todoDate" value="">
+                <div class="color-picker">
+                    <label for="todoColor">選擇顏色:</label>
+                    <select id="todoColor">
+                        <option value="#000000">黑色</option>
+                        <option value="#FF0000">紅色</option>
+                        <option value="#00FF00">綠色</option>
+                        <option value="#0000FF">藍色</option>
+                        <option value="#FFA500">橙色</option>
+                        <option value="#800080">紫色</option>
+                        <option value="#FFC0CB">粉色</option>
+                        <option value="#A52A2A">棕色</option>
+                    </select>
+                </div>
+            </div>
+            <button id="addBtn" class="add-btn">新增</button>
+            <div class="todo-limit-info">
+                <span id="todoLimitInfo">還可新增 100 則記事</span>
+            </div>
+        </div>
+
+        <!-- 分類標籤 -->
+        <div class="tabs">
+            <button class="tab-btn active" data-filter="today">今天</button>
+            <button class="tab-btn" data-filter="week">本週</button>
+            <button class="tab-btn" data-filter="all">全部</button>
+            <button class="tab-btn" data-filter="overdue">過期</button>
+        </div>
+
+        <!-- 待辦事項列表 -->
+        <div class="todo-list" id="todoList">
+            <!-- 待辦事項將在這裡動態生成 -->
+        </div>
+
+        <!-- 統計資訊 -->
+        <div class="stats">
+            <div class="stat-item">
+                <span class="stat-number" id="totalCount">0/100</span>
+                <span class="stat-label">總計</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number" id="completedCount">0</span>
+                <span class="stat-label">已完成</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number" id="pendingCount">0</span>
+                <span class="stat-label">待完成</span>
+            </div>
+        </div>
+        
+        <!-- 記事數量進度條 -->
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="progress-text" id="progressText">0% (0/100)</div>
+        </div>
+    </div>
+
+    <!-- 編輯待辦事項的模態框 -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>編輯待辦事項</h2>
+            <div class="edit-form">
+                <input type="text" id="editInput" placeholder="編輯待辦事項... (最多100字)" maxlength="100">
+                <input type="date" id="editDate">
+                <div class="color-picker">
+                    <label for="editColor">選擇顏色:</label>
+                    <select id="editColor">
+                        <option value="#000000">黑色</option>
+                        <option value="#FF0000">紅色</option>
+                        <option value="#00FF00">綠色</option>
+                        <option value="#0000FF">藍色</option>
+                        <option value="#FFA500">橙色</option>
+                        <option value="#800080">紫色</option>
+                        <option value="#FFC0CB">粉色</option>
+                        <option value="#A52A2A">棕色</option>
+                    </select>
+                </div>
+                <div class="edit-buttons">
+                    <button id="saveEditBtn" class="save-btn">儲存</button>
+                    <button id="cancelEditBtn" class="cancel-btn">取消</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

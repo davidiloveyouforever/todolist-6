@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>測試 - 待辦事項清單</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: #f0f0f0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        input {
+            padding: 8px;
+            margin: 5px;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+        }
+        .todo-item {
+            background: #f9f9f9;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 5px;
+            border-left: 3px solid #4CAF50;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 待辦事項測試頁面</h1>
+        
+        <div class="test-section">
+            <h3>測試基本功能</h3>
+            <button onclick="testBasicFunctions()">測試基本功能</button>
+            <button onclick="testAddTodo()">測試新增待辦事項</button>
+            <button onclick="testLocalStorage()">測試本地儲存</button>
+            <button onclick="clearAll()">清除所有資料</button>
+        </div>
+        
+        <div class="test-section">
+            <h3>新增測試待辦事項</h3>
+            <input type="text" id="testInput" placeholder="輸入測試內容" value="測試待辦事項">
+            <input type="date" id="testDate" value="">
+            <button onclick="addTestTodo()">新增測試項目</button>
+        </div>
+        
+        <div class="test-section">
+            <h3>顯示所有待辦事項</h3>
+            <div id="todoDisplay"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>控制台輸出</h3>
+            <p>請開啟瀏覽器的開發者工具（F12）查看控制台輸出</p>
+        </div>
+    </div>
+
+    <script>
+        // 設定今天的日期
+        document.getElementById('testDate').value = new Date().toISOString().split('T')[0];
+        
+        function testBasicFunctions() {
+            console.log('=== 測試基本功能 ===');
+            console.log('當前時間:', new Date());
+            console.log('localStorage 可用:', typeof(Storage) !== "undefined");
+            console.log('JSON 可用:', typeof(JSON) !== "undefined");
+            console.log('DOM 載入完成');
+        }
+        
+        function testAddTodo() {
+            console.log('=== 測試新增待辦事項 ===');
+            const text = document.getElementById('testInput').value;
+            const date = document.getElementById('testDate').value;
+            
+            if (!text || !date) {
+                alert('請輸入內容和選擇日期！');
+                return;
+            }
+            
+            const todo = {
+                id: Date.now(),
+                text: text,
+                date: date,
+                color: '#000000',
+                completed: false,
+                createdAt: new Date().toISOString()
+            };
+            
+            console.log('新增的待辦事項:', todo);
+            
+            // 儲存到 localStorage
+            const todos = JSON.parse(localStorage.getItem('todos')) || [];
+            todos.push(todo);
+            localStorage.setItem('todos', JSON.stringify(todos));
+            
+            console.log('儲存成功！當前待辦事項數量:', todos.length);
+            displayTodos();
+        }
+        
+        function testLocalStorage() {
+            console.log('=== 測試本地儲存 ===');
+            const todos = JSON.parse(localStorage.getItem('todos')) || [];
+            console.log('localStorage 中的待辦事項:', todos);
+            console.log('待辦事項數量:', todos.length);
+        }
+        
+        function displayTodos() {
+            const todos = JSON.parse(localStorage.getItem('todos')) || [];
+            const display = document.getElementById('todoDisplay');
+            
+            if (todos.length === 0) {
+                display.innerHTML = '<p>沒有待辦事項</p>';
+                return;
+            }
+            
+            display.innerHTML = todos.map(todo => `
+                <div class="todo-item">
+                    <strong>${todo.text}</strong><br>
+                    日期: ${todo.date}<br>
+                    狀態: ${todo.completed ? '已完成' : '未完成'}<br>
+                    ID: ${todo.id}
+                </div>
+            `).join('');
+        }
+        
+        function clearAll() {
+            if (confirm('確定要清除所有資料嗎？')) {
+                localStorage.removeItem('todos');
+                console.log('所有資料已清除');
+                displayTodos();
+            }
+        }
+        
+        // 頁面載入時顯示待辦事項
+        window.onload = function() {
+            console.log('頁面載入完成');
+            testBasicFunctions();
+            displayTodos();
+        };
+    </script>
+</body>
+</html>
+

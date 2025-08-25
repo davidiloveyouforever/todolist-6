@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>測試100則記事功能</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: #f0f0f0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: #e9ecef;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        .progress-fill {
+            height: 100%;
+            background: #4CAF50;
+            transition: width 0.5s ease;
+        }
+        .todo-item {
+            background: #f9f9f9;
+            padding: 8px;
+            margin: 3px 0;
+            border-radius: 3px;
+            border-left: 3px solid #4CAF50;
+            font-size: 0.9rem;
+        }
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        .stat-item {
+            text-align: center;
+        }
+        .stat-number {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #4CAF50;
+        }
+        .stat-label {
+            font-size: 0.9rem;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 測試100則記事功能</h1>
+        
+        <div class="test-section">
+            <h3>快速測試功能</h3>
+            <button onclick="createTestTodos(10)">新增10則測試記事</button>
+            <button onclick="createTestTodos(50)">新增50則測試記事</button>
+            <button onclick="createTestTodos(100)">新增100則測試記事</button>
+            <button onclick="clearAllTodos()">清除所有記事</button>
+            <button onclick="testLocalStorage()">測試本地儲存</button>
+        </div>
+        
+        <div class="test-section">
+            <h3>記事統計</h3>
+            <div class="stats">
+                <div class="stat-item">
+                    <div class="stat-number" id="totalCount">0</div>
+                    <div class="stat-label">總計</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="completedCount">0</div>
+                    <div class="stat-label">已完成</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="pendingCount">0</div>
+                    <div class="stat-label">待完成</div>
+                </div>
+            </div>
+            
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+            </div>
+            <div id="progressText" style="text-align: center; font-weight: bold;">0% (0/100)</div>
+        </div>
+        
+        <div class="test-section">
+            <h3>記事列表 (最多顯示前20則)</h3>
+            <div id="todoDisplay"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>控制台輸出</h3>
+            <p>請開啟瀏覽器的開發者工具（F12）查看控制台輸出</p>
+            <p>在手機上，請使用瀏覽器的開發者工具或查看控制台</p>
+        </div>
+    </div>
+
+    <script>
+        let todos = [];
+        const maxTodos = 100;
+        
+        // 頁面載入時讀取現有記事
+        window.onload = function() {
+            console.log('=== 測試頁面載入 ===');
+            loadTodos();
+            updateDisplay();
+        };
+        
+        function loadTodos() {
+            try {
+                const storedTodos = localStorage.getItem('todos');
+                console.log('從localStorage讀取的數據:', storedTodos);
+                
+                if (storedTodos) {
+                    todos = JSON.parse(storedTodos);
+                    console.log('解析後的記事:', todos);
+                    console.log('記事數量:', todos.length);
+                } else {
+                    todos = [];
+                    console.log('localStorage中沒有數據');
+                }
+            } catch (error) {
+                console.error('讀取localStorage時發生錯誤:', error);
+                todos = [];
+            }
+        }
+        
+        function saveTodos() {
+            try {
+                const todosJson = JSON.stringify(todos);
+                console.log('準備儲存到localStorage的數據長度:', todosJson.length);
+                
+                localStorage.setItem('todos', todosJson);
+                
+                // 驗證儲存
+                const storedData = localStorage.getItem('todos');
+                if (storedData) {
+                    console.log('儲存成功！記事數量:', todos.length);
+                } else {
+                    console.error('儲存失敗');
+                }
+            } catch (error) {
+                console.error('儲存失敗:', error);
+            }
+        }
+        
+        function createTestTodos(count) {
+            console.log(`=== 新增 ${count} 則測試記事 ===`);
+            
+            const currentCount = todos.length;
+            const canAdd = Math.min(count, maxTodos - currentCount);
+            
+            if (canAdd <= 0) {
+                alert('已達到100則記事限制！');
+                return;
+            }
+            
+            for (let i = 0; i < canAdd; i++) {
+                const todo = {
+                    id: Date.now() + i,
+                    text: `測試記事 ${currentCount + i + 1}`,
+                    date: new Date().toISOString().split('T')[0],
+                    color: '#000000',
+                    completed: false,
+                    createdAt: new Date().toISOString()
+                };
+                
+                todos.push(todo);
+                console.log(`新增記事 ${i + 1}:`, todo);
+            }
+            
+            console.log(`成功新增 ${canAdd} 則記事，總計: ${todos.length}`);
+            
+            saveTodos();
+            updateDisplay();
+        }
+        
+        function clearAllTodos() {
+            if (confirm('確定要清除所有記事嗎？')) {
+                todos = [];
+                localStorage.removeItem('todos');
+                console.log('所有記事已清除');
+                updateDisplay();
+            }
+        }
+        
+        function testLocalStorage() {
+            console.log('=== 測試本地儲存 ===');
+            console.log('localStorage 可用:', typeof(Storage) !== "undefined");
+            console.log('JSON 可用:', typeof(JSON) !== "undefined");
+            console.log('當前記事數量:', todos.length);
+            console.log('localStorage 中的數據:', localStorage.getItem('todos'));
+        }
+        
+        function updateDisplay() {
+            // 更新統計
+            const total = todos.length;
+            const completed = todos.filter(todo => todo.completed).length;
+            const pending = total - completed;
+            
+            document.getElementById('totalCount').textContent = total;
+            document.getElementById('completedCount').textContent = completed;
+            document.getElementById('pendingCount').textContent = pending;
+            
+            // 更新進度條
+            const percentage = Math.min((total / maxTodos) * 100, 100);
+            document.getElementById('progressFill').style.width = `${percentage}%`;
+            document.getElementById('progressText').textContent = `${Math.round(percentage)}% (${total}/${maxTodos})`;
+            
+            // 更新記事顯示
+            const display = document.getElementById('todoDisplay');
+            if (todos.length === 0) {
+                display.innerHTML = '<p>沒有記事</p>';
+                return;
+            }
+            
+            // 只顯示前20則記事以避免頁面過長
+            const displayTodos = todos.slice(0, 20);
+            display.innerHTML = displayTodos.map(todo => `
+                <div class="todo-item">
+                    <strong>${todo.text}</strong> | 
+                    日期: ${todo.date} | 
+                    狀態: ${todo.completed ? '已完成' : '未完成'} | 
+                    ID: ${todo.id}
+                </div>
+            `).join('');
+            
+            if (todos.length > 20) {
+                display.innerHTML += `<p style="text-align: center; color: #666; margin-top: 10px;">
+                    還有 ${todos.length - 20} 則記事未顯示...
+                </p>`;
+            }
+        }
+    </script>
+</body>
+</html>

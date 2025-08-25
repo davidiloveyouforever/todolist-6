@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>測試本週功能</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: #f0f0f0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        .tab-btn {
+            background: #e9ecef;
+            border: 2px solid transparent;
+            border-radius: 25px;
+            padding: 10px 20px;
+            margin: 5px;
+            cursor: pointer;
+        }
+        .tab-btn.active {
+            background: #4CAF50;
+            color: white;
+        }
+        .todo-item {
+            background: #f9f9f9;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 5px;
+            border-left: 3px solid #4CAF50;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 測試本週功能</h1>
+        
+        <div class="test-section">
+            <h3>測試標籤切換</h3>
+            <button class="tab-btn active" data-filter="today">今天</button>
+            <button class="tab-btn" data-filter="week">本週</button>
+            <button class="tab-btn" data-filter="all">全部</button>
+            <button class="tab-btn" data-filter="overdue">過期</button>
+        </div>
+        
+        <div class="test-section">
+            <h3>快速創建測試記事</h3>
+            <button onclick="createWeekTestTodos()">創建本週測試記事</button>
+            <button onclick="createTodayTestTodos()">創建今天測試記事</button>
+            <button onclick="createOverdueTestTodos()">創建過期測試記事</button>
+            <button onclick="clearAllTodos()">清除所有記事</button>
+        </div>
+        
+        <div class="test-section">
+            <h3>當前過濾器: <span id="currentFilter">今天</span></h3>
+            <p>記事數量: <span id="todoCount">0</span></p>
+        </div>
+        
+        <div class="test-section">
+            <h3>記事列表</h3>
+            <div id="todoDisplay"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>控制台輸出</h3>
+            <p>請開啟瀏覽器的開發者工具（F12）查看控制台輸出</p>
+        </div>
+    </div>
+
+    <script>
+        let todos = [];
+        let currentFilter = 'today';
+        
+        // 頁面載入時初始化
+        window.onload = function() {
+            console.log('=== 測試頁面載入 ===');
+            loadTodos();
+            setupTabButtons();
+            updateDisplay();
+        };
+        
+        function setupTabButtons() {
+            const tabButtons = document.querySelectorAll('.tab-btn');
+            console.log('找到的標籤按鈕數量:', tabButtons.length);
+            
+            tabButtons.forEach((btn, index) => {
+                console.log(`標籤按鈕 ${index}:`, btn.textContent, 'data-filter:', btn.dataset.filter);
+                btn.addEventListener('click', (e) => {
+                    console.log('標籤按鈕被點擊:', e.target.textContent, 'filter:', e.target.dataset.filter);
+                    switchTab(e.target.dataset.filter);
+                });
+            });
+        }
+        
+        function switchTab(filter) {
+            console.log('切換到標籤:', filter);
+            currentFilter = filter;
+            
+            // 更新標籤狀態
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            const targetBtn = document.querySelector(`[data-filter="${filter}"]`);
+            if (targetBtn) {
+                targetBtn.classList.add('active');
+                console.log('標籤狀態已更新');
+            } else {
+                console.error('找不到目標標籤按鈕:', filter);
+            }
+            
+            updateDisplay();
+        }
+        
+        function loadTodos() {
+            try {
+                const storedTodos = localStorage.getItem('todos');
+                if (storedTodos) {
+                    todos = JSON.parse(storedTodos);
+                    console.log('載入記事:', todos);
+                }
+            } catch (error) {
+                console.error('載入記事失敗:', error);
+                todos = [];
+            }
+        }
+        
+        function saveTodos() {
+            try {
+                localStorage.setItem('todos', JSON.stringify(todos));
+                console.log('記事已儲存');
+            } catch (error) {
+                console.error('儲存記事失敗:', error);
+            }
+        }
+        
+        function createWeekTestTodos() {
+            const today = new Date();
+            const weekStart = new Date(today);
+            weekStart.setDate(today.getDate() - today.getDay());
+            
+            // 創建本週的記事
+            for (let i = 0; i < 7; i++) {
+                const date = new Date(weekStart);
+                date.setDate(weekStart.getDate() + i);
+                const dateStr = date.toISOString().split('T')[0];
+                
+                const todo = {
+                    id: Date.now() + i,
+                    text: `本週記事 ${i + 1} (${dateStr})`,
+                    date: dateStr,
+                    color: '#000000',
+                    completed: false,
+                    createdAt: new Date().toISOString()
+                };
+                
+                todos.push(todo);
+                console.log('新增本週記事:', todo);
+            }
+            
+            saveTodos();
+            updateDisplay();
+        }
+        
+        function createTodayTestTodos() {
+            const today = new Date().toISOString().split('T')[0];
+            
+            for (let i = 0; i < 3; i++) {
+                const todo = {
+                    id: Date.now() + i,
+                    text: `今天記事 ${i + 1}`,
+                    date: today,
+                    color: '#000000',
+                    completed: false,
+                    createdAt: new Date().toISOString()
+                };
+                
+                todos.push(todo);
+                console.log('新增今天記事:', todo);
+            }
+            
+            saveTodos();
+            updateDisplay();
+        }
+        
+        function createOverdueTestTodos() {
+            const today = new Date();
+            const yesterday = new Date(today);
+            yesterday.setDate(today.getDate() - 1);
+            const yesterdayStr = yesterday.toISOString().split('T')[0];
+            
+            for (let i = 0; i < 2; i++) {
+                const todo = {
+                    id: Date.now() + i,
+                    text: `過期記事 ${i + 1}`,
+                    date: yesterdayStr,
+                    color: '#000000',
+                    completed: false,
+                    createdAt: new Date().toISOString()
+                };
+                
+                todos.push(todo);
+                console.log('新增過期記事:', todo);
+            }
+            
+            saveTodos();
+            updateDisplay();
+        }
+        
+        function clearAllTodos() {
+            if (confirm('確定要清除所有記事嗎？')) {
+                todos = [];
+                localStorage.removeItem('todos');
+                console.log('所有記事已清除');
+                updateDisplay();
+            }
+        }
+        
+        function getFilteredTodos() {
+            const today = new Date();
+            const todayStr = today.toISOString().split('T')[0];
+            
+            // 計算本週的開始和結束日期
+            const weekStart = new Date(today);
+            weekStart.setDate(today.getDate() - today.getDay());
+            weekStart.setHours(0, 0, 0, 0);
+            
+            const weekEnd = new Date(weekStart);
+            weekEnd.setDate(weekStart.getDate() + 6);
+            weekEnd.setHours(23, 59, 59, 999);
+            
+            console.log('本週開始日期:', weekStart.toISOString());
+            console.log('本週結束日期:', weekEnd.toISOString());
+            console.log('今天日期:', today.toISOString());
+            
+            switch (currentFilter) {
+                case 'today':
+                    return todos.filter(todo => todo.date === todayStr);
+                case 'week':
+                    return todos.filter(todo => {
+                        const todoDate = new Date(todo.date);
+                        todoDate.setHours(12, 0, 0, 0);
+                        return todoDate >= weekStart && todoDate <= weekEnd;
+                    });
+                case 'all':
+                    return todos;
+                case 'overdue':
+                    return todos.filter(todo => {
+                        const todoDate = new Date(todo.date);
+                        return todoDate < today && !todo.completed;
+                    });
+                default:
+                    return todos;
+            }
+        }
+        
+        function updateDisplay() {
+            const filteredTodos = getFilteredTodos();
+            
+            document.getElementById('currentFilter').textContent = currentFilter;
+            document.getElementById('todoCount').textContent = filteredTodos.length;
+            
+            const display = document.getElementById('todoDisplay');
+            if (filteredTodos.length === 0) {
+                display.innerHTML = '<p>沒有記事</p>';
+                return;
+            }
+            
+            display.innerHTML = filteredTodos.map(todo => `
+                <div class="todo-item">
+                    <strong>${todo.text}</strong><br>
+                    日期: ${todo.date} | 
+                    狀態: ${todo.completed ? '已完成' : '未完成'}
+                </div>
+            `).join('');
+        }
+    </script>
+</body>
+</html>

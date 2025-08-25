@@ -1,0 +1,29 @@
+{
+    "name": "待辦事項清單",
+    "short_name": "待辦事項",
+    "description": "一個功能完整的待辦事項清單應用程式，支援顏色選擇、日期管理、分類瀏覽等功能",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#667eea",
+    "theme_color": "#4CAF50",
+    "orientation": "portrait-primary",
+    "icons": [
+        {
+            "src": "icon-192x192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any maskable"
+        },
+        {
+            "src": "icon-512x512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any maskable"
+        }
+    ],
+    "categories": ["productivity", "utilities"],
+    "lang": "zh-TW",
+    "dir": "ltr",
+    "scope": "/",
+    "prefer_related_applications": false
+}
